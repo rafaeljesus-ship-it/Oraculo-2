@@ -4,124 +4,197 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Oráculo de Pré-Vendas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --border: #272b35;
-    --text: #e8e9ec;
-    --muted: #9aa0ac;
-    --accent: #6c5ce7;
-    --accent-hover: #7d6ef0;
-    --ok: #3ddc97;
-    --warn: #ffb020;
-    --danger: #ff5c5c;
+    /* Paleta Flash */
+    --rosa-flash: #FE2B8F;
+    --rosa-dark-1: #E6007C;
+    --rosa-dark-2: #A60058;
+    --rosa-light-1: #FFECF2;
+    --rosa-light-2: #FF9ABD;
+    --rosa-light-3: #FF6D94;
+    --despesas: #D63275;
+    --pessoas: #FFC2D0;
+    --neutral-900: #333333;
+    --neutral-700: #5c5c5c;
+    --neutral-300: #D9D9D9;
+    --neutral-200: #C9C8C9;
+    --white: #FFFFFF;
+    --danger: #c0392b;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, var(--rosa-light-1) 0%, #fff 320px);
+    color: var(--neutral-900);
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 40px 16px;
+    padding: 48px 16px;
   }
-  main {
-    width: 100%;
-    max-width: 640px;
+  main { width: 100%; max-width: 640px; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
   }
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--rosa-flash);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: "Fustat", sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .brand-name {
+    font-family: "Fustat", sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--rosa-dark-2);
+    letter-spacing: 0.02em;
+  }
+
   h1 {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
+    font-family: "Fustat", sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    margin: 0 0 6px;
+    color: var(--neutral-900);
   }
   .subtitle {
-    color: var(--muted);
+    color: var(--neutral-700);
     margin-bottom: 28px;
     font-size: 0.95rem;
+    line-height: 1.5;
   }
+
   form {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
+    background: var(--white);
+    border: 1px solid var(--neutral-300);
+    border-radius: 16px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+    box-shadow: 0 8px 24px rgba(254, 43, 143, 0.08);
   }
   label {
-    font-size: 0.85rem;
-    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--neutral-900);
     display: block;
     margin-bottom: 6px;
   }
   input, select, textarea {
     width: 100%;
-    background: #0f1115;
-    border: 1px solid var(--border);
-    color: var(--text);
+    background: #fafafa;
+    border: 1.5px solid var(--neutral-300);
+    color: var(--neutral-900);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 11px 12px;
     font-size: 0.95rem;
     font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
   }
   textarea { resize: vertical; min-height: 70px; }
   input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--rosa-flash);
+    background: var(--white);
   }
   .field.required label::after {
     content: " *";
-    color: var(--danger);
+    color: var(--rosa-flash);
   }
   button {
-    background: var(--accent);
+    background: var(--rosa-flash);
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 12px 16px;
+    border-radius: 999px;
+    padding: 13px 16px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: "Fustat", sans-serif;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.1s;
   }
-  button:hover:not(:disabled) { background: var(--accent-hover); }
-  button:disabled { opacity: 0.6; cursor: wait; }
+  button:hover:not(:disabled) { background: var(--rosa-dark-1); }
+  button:active:not(:disabled) { transform: scale(0.98); }
+  button:disabled { opacity: 0.55; cursor: wait; }
 
   #resultado {
     margin-top: 20px;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: var(--white);
+    border: 1px solid var(--neutral-300);
+    border-left: 4px solid var(--rosa-flash);
     border-radius: 12px;
-    padding: 20px;
+    padding: 22px;
     display: none;
     white-space: pre-wrap;
-    line-height: 1.5;
+    line-height: 1.55;
     font-size: 0.95rem;
   }
   #resultado.visible { display: block; }
-  #resultado strong { color: var(--accent); }
+  #resultado strong { color: var(--rosa-dark-1); }
 
   .status {
     font-size: 0.85rem;
-    color: var(--muted);
-    margin-top: 10px;
+    color: var(--neutral-700);
+    margin-top: 4px;
     display: none;
   }
   .status.visible { display: block; }
   .status.error { color: var(--danger); }
 
+  .bu-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: white;
+    background: var(--rosa-flash);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
   footer {
-    margin-top: 24px;
-    color: var(--muted);
+    margin-top: 28px;
+    color: var(--neutral-700);
     font-size: 0.78rem;
     text-align: center;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: linear-gradient(180deg, #2a1420 0%, #15161a 320px); color: #f0f0f0; }
+    form { background: #1d1e24; border-color: #33343c; }
+    input, select, textarea { background: #15161a; border-color: #33343c; color: #f0f0f0; }
+    input:focus, select:focus, textarea:focus { background: #1d1e24; }
+    #resultado { background: #1d1e24; border-color: #33343c; }
+    .subtitle, .status { color: #b9b9c0; }
+    h1 { color: #f5f5f5; }
+    label { color: #e4e4e8; }
   }
 </style>
 </head>
 <body>
 <main>
+  <div class="brand">
+    <div class="brand-mark">F</div>
+    <div class="brand-name">FLASH</div>
+  </div>
+
   <h1>🔮 Oráculo de Pré-Vendas</h1>
   <p class="subtitle">
     Consulte a política de abordagem, duplicidade de negócio, motivos de
