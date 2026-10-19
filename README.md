@@ -10,14 +10,26 @@ decidido em outubro/2026.
 
 ## Arquitetura
 
+Dois caminhos de entrada, mesmo motor por trás:
+
 ```
-Slack Workflow Builder (formulário)
-  → etapa "De um webhook" → POST /webhook/oraculo (este servidor, no Render)
-      → consulta o HubSpot (CRM em tempo real)
-      → monta o prompt com a base de conhecimento (knowledge-base/)
-      → chama a API do Gemini
-      → posta o veredito de volta no canal via Slack API (chat.postMessage)
+Caminho A - Slack:
+  Slack Workflow Builder (formulário)
+    → etapa "De um webhook" → POST /webhook/oraculo
+        → consulta o HubSpot, monta o prompt, chama o Gemini
+        → posta o veredito de volta no canal via Slack API
+
+Caminho B - página web (fallback, se o Slack for bloqueado):
+  public/index.html (formulário web, servido em "/")
+    → POST /api/consulta
+        → mesma logica (consulta o HubSpot, monta o prompt, chama o Gemini)
+        → devolve o veredito na própria página, sem tocar no Slack
 ```
+
+Os dois caminhos reaproveitam a mesma função `resolveVerdict()` em
+`src/routes/oraculo.js` — a base de conhecimento e a lógica de decisão
+são idênticas nos dois casos, só muda por onde a pergunta entra e por
+onde a resposta sai.
 
 ## Estrutura
 
@@ -104,6 +116,22 @@ o endpoint `/admin/reload-knowledge-base`, sem precisar reiniciar).
 Esse passo substitui as etapas "Gerar resposta da IA" e "Enviar mensagem"
 que estavam no caminho 100%-Slack — agora é o webhook que dispara todo o
 processamento no servidor.
+
+### 6. Caminho alternativo: página web (sem depender do Slack)
+A própria URL do Render (ex: `https://oraculo-2-xxxx.onrender.com/`) já
+serve um formulário web equivalente ao do Slack. Basta compartilhar esse
+link com o time — não precisa de nenhuma configuração extra no Slack.
+
+Para proteger essa página de acesso público não autorizado (ela fica
+acessível por qualquer um que tenha o link, e cada consulta gasta
+crédito de API):
+1. No Render, adicione a variável `FRONTEND_ACCESS_CODE` com uma senha
+   simples de sua escolha.
+2. Compartilhe essa senha só com o time autorizado — eles colam no campo
+   "Código de acesso" do formulário.
+3. Sem essa variável configurada, a página fica aberta sem senha (só
+   tem o limite de 15 consultas por IP a cada 10 minutos, como proteção
+   básica contra abuso).
 
 ## Rodando localmente
 

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Oráculo de Pré-Vendas</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #272b35;
+    --text: #e8e9ec;
+    --muted: #9aa0ac;
+    --accent: #6c5ce7;
+    --accent-hover: #7d6ef0;
+    --ok: #3ddc97;
+    --warn: #ffb020;
+    --danger: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  main {
+    width: 100%;
+    max-width: 640px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-size: 0.95rem;
+  }
+  form {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: #0f1115;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .field.required label::after {
+    content: " *";
+    color: var(--danger);
+  }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover:not(:disabled) { background: var(--accent-hover); }
+  button:disabled { opacity: 0.6; cursor: wait; }
+
+  #resultado {
+    margin-top: 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: none;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+  #resultado.visible { display: block; }
+  #resultado strong { color: var(--accent); }
+
+  .status {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 10px;
+    display: none;
+  }
+  .status.visible { display: block; }
+  .status.error { color: var(--danger); }
+
+  footer {
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>🔮 Oráculo de Pré-Vendas</h1>
+  <p class="subtitle">
+    Consulte a política de abordagem, duplicidade de negócio, motivos de
+    perdido ou regras de prospecção. Caminho alternativo ao formulário do
+    Slack — use quando o Slack não estiver disponível.
+  </p>
+
+  <form id="form-oraculo">
+    <div class="field required">
+      <label for="solicitante">Solicitante</label>
+      <input type="text" id="solicitante" name="solicitante" placeholder="Seu nome" required />
+    </div>
+
+    <div class="field required">
+      <label for="time">Time</label>
+      <select id="time" name="time" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>BDR Outbound</option>
+        <option>SDR Inbound</option>
+        <option>BDR Farming</option>
+        <option>Vendas</option>
+        <option>AM</option>
+        <option>Canais</option>
+        <option>Pós-venda</option>
+      </select>
+    </div>
+
+    <div class="field required">
+      <label for="bu">BU</label>
+      <select id="bu" name="bu" required>
+        <option value="" disabled selected>Selecione</option>
+        <option>Benefícios</option>
+        <option>Despesas</option>
+        <option>Pessoas</option>
+      </select>
+    </div>
+
+    <div class="field required">
+      <label for="tipoDuvida">Tipo de dúvida</label>
+      <select id="tipoDuvida" name="tipoDuvida" required>
+        <option value="" disabled selected>Selecione</option>
+        <option value="Posso abordar essa empresa?">Posso abordar essa empresa?</option>
+        <option value="Duplicidade de negócio">Duplicidade de negócio</option>
+        <option value="Motivo de perdido">Motivo de perdido</option>
+        <option value="Regra de prospecção">Regra de prospecção</option>
+      </select>
+    </div>
+
+    <div class="field required">
+      <label for="linkHubspot">Link da empresa/negócio no HubSpot</label>
+      <input type="url" id="linkHubspot" name="linkHubspot"
+             placeholder="https://app.hubspot.com/contacts/.../record/0-3/..." required />
+    </div>
+
+    <div class="field">
+      <label for="contexto">Contexto adicional</label>
+      <textarea id="contexto" name="contexto" placeholder="Qualquer informação extra relevante para o caso"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="codigoAcesso">Código de acesso (se exigido)</label>
+      <input type="password" id="codigoAcesso" name="codigoAcesso" autocomplete="off" />
+    </div>
+
+    <button type="submit" id="btn-enviar">Consultar Oráculo</button>
+    <div class="status" id="status"></div>
+  </form>
+
+  <div id="resultado"></div>
+
+  <footer>Oráculo de Pré-Vendas · Flash · uso interno</footer>
+</main>
+
+<script>
+  const form = document.getElementById("form-oraculo");
+  const resultado = document.getElementById("resultado");
+  const status = document.getElementById("status");
+  const btn = document.getElementById("btn-enviar");
+
+  function showStatus(msg, isError) {
+    status.textContent = msg;
+    status.className = "status visible" + (isError ? " error" : "");
+  }
+
+  function hideStatus() {
+    status.className = "status";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideStatus();
+    resultado.className = "";
+    resultado.textContent = "";
+
+    const payload = {
+      Solicitante: form.solicitante.value,
+      Time: form.time.value,
+      BU: form.bu.value,
+      "Tipo de dúvida": form.tipoDuvida.value,
+      "Link HubSpot": form.linkHubspot.value,
+      Contexto: form.contexto.value,
+    };
+
+    btn.disabled = true;
+    btn.textContent = "Consultando...";
+    showStatus("Consultando o CRM e aplicando as regras — isso pode levar alguns segundos.");
+
+    try {
+      const res = await fetch("/api/consulta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Access-Code": form.codigoAcesso.value,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro desconhecido");
+      }
+
+      resultado.textContent = data.verdict;
+      resultado.className = "visible";
+      hideStatus();
+    } catch (err) {
+      showStatus("Erro ao consultar: " + err.message, true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Consultar Oráculo";
+    }
+  });
+</script>
+</body>
+</html>

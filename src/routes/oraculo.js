@@ -35,15 +35,15 @@ function normalizeForm(body) {
   };
 }
 
-router.post("/webhook/oraculo", checkSharedSecret, async (req, res) => {
-  const form = normalizeForm(req.body || {});
-  const channel = form.channel || process.env.DEFAULT_SLACK_CHANNEL;
-
+/**
+ * Logica central, compartilhada pelo caminho Slack (/webhook/oraculo) e
+ * pelo caminho da pagina web (/api/consulta): consulta o HubSpot,
+ * monta o prompt com a base de conhecimento e chama o Gemini. Nunca
+ * posta no Slack - isso fica a cargo de quem chama esta funcao.
+ */
+async function resolveVerdict(form) {
   if (!form.linkHubspot) {
-    const msg =
-      "*Veredito:* ESCALAR PARA HUMANO\n*Fundamentação:* Link da empresa/negócio no HubSpot não foi informado.\n*Escalada:* Peça ao solicitante para reenviar com o link preenchido.";
-    if (channel) await postMessage({ channel, text: msg }).catch(() => {});
-    return res.status(200).json({ ok: true, verdict: msg });
+    return "*Veredito:* ESCALAR PARA HUMANO\n*Fundamentação:* Link da empresa/negócio no HubSpot não foi informado.\n*Escalada:* Peça ao solicitante para reenviar com o link preenchido.";
   }
 
   let hubspotContext = null;
@@ -54,12 +54,18 @@ router.post("/webhook/oraculo", checkSharedSecret, async (req, res) => {
     hubspotError = err.message;
   }
 
-  let verdictText;
   try {
-    verdictText = await getVerdict({ form, hubspotContext, hubspotError });
+    return await getVerdict({ form, hubspotContext, hubspotError });
   } catch (err) {
-    verdictText = `*Veredito:* ESCALAR PARA HUMANO\n*Fundamentação:* Erro ao consultar o modelo de IA (${err.message}).\n*Escalada:* Tentar novamente ou acionar o time do Oráculo.`;
+    return `*Veredito:* ESCALAR PARA HUMANO\n*Fundamentação:* Erro ao consultar o modelo de IA (${err.message}).\n*Escalada:* Tentar novamente ou acionar o time do Oráculo.`;
   }
+}
+
+router.post("/webhook/oraculo", checkSharedSecret, async (req, res) => {
+  const form = normalizeForm(req.body || {});
+  const channel = form.channel || process.env.DEFAULT_SLACK_CHANNEL;
+
+  const verdictText = await resolveVerdict(form);
 
   if (channel) {
     try {
@@ -71,6 +77,39 @@ router.post("/webhook/oraculo", checkSharedSecret, async (req, res) => {
     }
   }
 
+  return res.status(200).json({ ok: true, verdict: verdictText });
+});
+
+// --- Caminho alternativo: pagina web em public/index.html --------------
+// Limite simples de taxa por IP em memoria, so pra evitar que a pagina
+// publica seja usada para gastar credito de API sem controle. Nao
+// sobrevive a reinicio/redeploy do processo - e so uma rede de
+// seguranca basica, nao substitui autenticacao de verdade.
+const rateLimitWindowMs = 10 * 60 * 1000; // 10 minutos
+const rateLimitMax = 15;
+const requestLog = new Map(); // ip -> [timestamps]
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const timestamps = (requestLog.get(ip) || []).filter((t) => now - t < rateLimitWindowMs);
+  timestamps.push(now);
+  requestLog.set(ip, timestamps);
+  return timestamps.length > rateLimitMax;
+}
+
+router.post("/api/consulta", async (req, res) => {
+  const accessCode = process.env.FRONTEND_ACCESS_CODE;
+  if (accessCode && req.header("X-Access-Code") !== accessCode) {
+    return res.status(401).json({ error: "Código de acesso inválido ou ausente." });
+  }
+
+  const ip = req.header("x-forwarded-for") || req.socket.remoteAddress || "desconhecido";
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: "Muitas consultas em pouco tempo. Aguarde alguns minutos." });
+  }
+
+  const form = normalizeForm(req.body || {});
+  const verdictText = await resolveVerdict(form);
   return res.status(200).json({ ok: true, verdict: verdictText });
 });
 
