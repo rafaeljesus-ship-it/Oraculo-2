@@ -1,0 +1,19 @@
+{
+  "name": "oraculo-pre-vendas",
+  "version": "1.0.0",
+  "description": "Oraculo de Pre-Vendas da Flash - agente que aplica a politica de abordagem, duplicidade, motivos de perdido e regras de prospeccao, acionado via Slack Workflow Builder.",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.21.1",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
