@@ -27,6 +27,7 @@ ${kb.text}
 - Solicitante: ${form.solicitante || "(não informado)"}
 - Time: ${form.time || "(não informado)"}
 - BU: ${form.bu || "(não informado)"}
+- Tier informado pelo solicitante: ${form.tier || "(não informado — confirme o tier real pelo registro do HubSpot)"}
 - Tipo de dúvida: ${form.tipoDuvida || "(não informado)"}
 - Link da empresa/negócio no HubSpot: ${form.linkHubspot || "(não informado)"}
 - Contexto adicional do solicitante: ${form.contexto || "(nenhum)"}
@@ -46,7 +47,7 @@ async function getVerdict({ form, hubspotContext, hubspotError }) {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
   });
 
   const prompt = buildPrompt({ form, hubspotContext, hubspotError });

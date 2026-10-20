@@ -232,6 +232,20 @@
       </select>
     </div>
 
+    <div class="field">
+      <label for="tier">Tier (se souber)</label>
+      <select id="tier" name="tier">
+        <option value="" selected>Não sei / prefiro não informar</option>
+        <option>T0</option>
+        <option>T1</option>
+        <option>T2</option>
+        <option>T3</option>
+        <option>T4</option>
+        <option>T5</option>
+        <option>T6 / Enterprise</option>
+      </select>
+    </div>
+
     <div class="field required">
       <label for="tipoDuvida">Tipo de dúvida</label>
       <select id="tipoDuvida" name="tipoDuvida" required>
@@ -293,6 +307,7 @@
       Solicitante: form.solicitante.value,
       Time: form.time.value,
       BU: form.bu.value,
+      Tier: form.tier.value,
       "Tipo de dúvida": form.tipoDuvida.value,
       "Link HubSpot": form.linkHubspot.value,
       Contexto: form.contexto.value,

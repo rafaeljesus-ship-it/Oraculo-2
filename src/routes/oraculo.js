@@ -28,6 +28,7 @@ function normalizeForm(body) {
     solicitante: pick("Solicitante", "solicitante"),
     time: pick("Time", "time"),
     bu: pick("BU", "bu"),
+    tier: pick("Tier", "tier"),
     tipoDuvida: pick("Tipo de dúvida", "Tipo de Dúvida", "TipoDuvida", "tipo_duvida"),
     linkHubspot: pick("Link HubSpot", "Link do Hub", "LinkHubSpot", "link_hubspot"),
     contexto: pick("Contexto", "contexto"),

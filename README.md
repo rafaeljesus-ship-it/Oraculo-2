@@ -150,6 +150,7 @@ curl -X POST http://localhost:3000/webhook/oraculo \
     "Solicitante": "Rafa",
     "Time": "BDR Outbound",
     "BU": "Benefícios",
+    "Tier": "T3",
     "Tipo de dúvida": "Posso abordar essa empresa?",
     "Link HubSpot": "https://app.hubspot.com/contacts/5938567/record/0-3/65817315739",
     "Contexto": "teste local"
